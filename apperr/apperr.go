@@ -15,7 +15,7 @@ func (e *Err) Error() string {
 	return e.Message
 }
 
-// Extract is a function to extract operr.Err from an error.
+// Extract is a function to extract apperr.Err from an error.
 func Extract(err error) (*Err, bool) {
 	e := &Err{}
 	if ok := errors.As(err, &e); !ok {
