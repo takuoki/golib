@@ -16,10 +16,8 @@ func SetRequestID(ctx context.Context, requestID string) context.Context {
 // GetRequestID returns requestID from the context.
 // If it does not exists, returns an empty string.
 func GetRequestID(ctx context.Context) string {
-	v := ctx.Value(requestIDContextKey)
-	requestID, ok := v.(string)
-	if !ok {
-		return ""
+	if requestID, ok := ctx.Value(requestIDContextKey).(string); ok {
+		return requestID
 	}
-	return requestID
+	return ""
 }
