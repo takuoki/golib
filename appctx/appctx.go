@@ -1,3 +1,5 @@
+// Package appctx defines a function that securely sets and gets
+// the request scope data required by the application.
 package appctx
 
 import (

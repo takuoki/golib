@@ -26,6 +26,12 @@ func TestErr(t *testing.T) {
 		if err.Log() != "" {
 			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "", err.Log())
 		}
+		if !err.IsClientError() {
+			t.Errorf("result value does not match expected value (want=%t, actual=%t)", true, err.IsClientError())
+		}
+		if err.IsServerError() {
+			t.Errorf("result value does not match expected value (want=%t, actual=%t)", false, err.IsServerError())
+		}
 	})
 	t.Run("server", func(t *testing.T) {
 		err := apperr.ServerError(1, "code", "message", "log")
@@ -43,6 +49,12 @@ func TestErr(t *testing.T) {
 		}
 		if err.Log() != "log" {
 			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "log", err.Log())
+		}
+		if err.IsClientError() {
+			t.Errorf("result value does not match expected value (want=%t, actual=%t)", false, err.IsClientError())
+		}
+		if !err.IsServerError() {
+			t.Errorf("result value does not match expected value (want=%t, actual=%t)", true, err.IsServerError())
 		}
 	})
 }
