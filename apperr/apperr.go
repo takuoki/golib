@@ -17,75 +17,117 @@ type Err interface {
 	IsServerError() bool
 }
 
-type er struct {
-	status   int
-	code     string
-	message  string
-	log      string
-	isClient bool
+type cerr struct {
+	status  int
+	code    string
+	message string
 }
 
 // ClientError creates new client error.
+// For RESTful API, set the HTTP status code to `status`.
+// Set the error code (ex. "E0001") that the client can handle to `code`.
 func ClientError(status int, code, message string) Err {
-	return &er{
-		status:   status,
-		code:     code,
-		message:  message,
-		isClient: true,
-	}
-}
-
-// ServerError creates new server error.
-func ServerError(status int, code, message, log string) Err {
-	return &er{
-		status:   status,
-		code:     code,
-		message:  message,
-		log:      log,
-		isClient: false,
+	return &cerr{
+		status:  status,
+		code:    code,
+		message: message,
 	}
 }
 
 // Error is a method to satisfy the error interface.
-func (e *er) Error() string {
+func (e *cerr) Error() string {
 	return e.message
 }
 
 // Status returns status value.
-func (e *er) Status() int {
+func (e *cerr) Status() int {
 	return e.status
 }
 
 // Code returns code string.
-func (e *er) Code() string {
+func (e *cerr) Code() string {
 	return e.code
 }
 
 // Message returns message string.
-func (e *er) Message() string {
+func (e *cerr) Message() string {
 	return e.message
 }
 
 // Log returns log string.
-func (e *er) Log() string {
+func (e *cerr) Log() string {
+	return ""
+}
+
+// IsClientError returns whether it is a client error.
+func (e *cerr) IsClientError() bool {
+	return true
+}
+
+// IsServerError returns whether it is a server error.
+func (e *cerr) IsServerError() bool {
+	return false
+}
+
+type serr struct {
+	status  int
+	code    string
+	message string
+	log     string
+}
+
+// ServerError creates new server error.
+// For RESTful API, set the HTTP status code to `status`.
+// Set the error code (ex. "E0001") that the client can handle to `code`.
+func ServerError(status int, code, message, log string) Err {
+	return &serr{
+		status:  status,
+		code:    code,
+		message: message,
+		log:     log,
+	}
+}
+
+// Error is a method to satisfy the error interface.
+func (e *serr) Error() string {
+	return e.message
+}
+
+// Status returns status value.
+func (e *serr) Status() int {
+	return e.status
+}
+
+// Code returns code string.
+func (e *serr) Code() string {
+	return e.code
+}
+
+// Message returns message string.
+func (e *serr) Message() string {
+	return e.message
+}
+
+// Log returns log string.
+func (e *serr) Log() string {
 	return e.log
 }
 
 // IsClientError returns whether it is a client error.
-func (e *er) IsClientError() bool {
-	return e.isClient
+func (e *serr) IsClientError() bool {
+	return false
 }
 
 // IsServerError returns whether it is a server error.
-func (e *er) IsServerError() bool {
-	return !e.isClient
+func (e *serr) IsServerError() bool {
+	return true
 }
 
 // Extract is a function to extract apperr.Err from an error.
 func Extract(err error) (Err, bool) {
-	e := &er{}
-	if ok := errors.As(err, &e); !ok {
-		return nil, false
+	var e Err
+	if ok := errors.As(err, &e); ok {
+		return e, true
 	}
-	return e, true
+	return nil, false
 }
