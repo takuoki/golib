@@ -78,7 +78,7 @@ type serr struct {
 
 // ServerError creates new server error.
 // For RESTful API, set the HTTP status code to `status`.
-// Set the error code (ex. "E0001") that the client can handle to `code`.
+// Set the error code (ex. "S0001") that the client can handle to `code`.
 func ServerError(status int, code, message, log string) Err {
 	return &serr{
 		status:  status,
