@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/takuoki/golib/appctx"
 )
 
@@ -13,15 +14,11 @@ func TestRequestID(t *testing.T) {
 		ctx := context.Background()
 		ctx = appctx.WithRequestID(ctx, testRequestID)
 		result := appctx.RequestID(ctx)
-		if result != testRequestID {
-			t.Errorf("value does not match the expected value (want=%q, actual=%q)", testRequestID, result)
-		}
+		assert.Equal(t, testRequestID, result, "RequestID is not equal.")
 	})
 	t.Run("empty", func(t *testing.T) {
 		ctx := context.Background()
 		result := appctx.RequestID(ctx)
-		if result != "" {
-			t.Errorf("value must be empty string (actual=%q)", result)
-		}
+		assert.Empty(t, result, "RequestID is not empty.")
 	})
 }
