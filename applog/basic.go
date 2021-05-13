@@ -23,7 +23,6 @@ type basicLogger struct {
 func NewBasicLogger(w io.Writer, opts ...Option) Logger {
 	logger := &basicLogger{
 		out:        w,
-		level:      InfoLevel,
 		timeFormat: time.RFC3339,
 	}
 	for _, opt := range opts {

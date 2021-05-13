@@ -1,12 +1,12 @@
 package applog
 
 // Level is the log level.
-// Higher is more important.
+// Higher levels are more important.
 type Level int
 
-// Level list.
+// Level list. Default is InfoLevel.
 const (
-	UnknownLevel Level = iota
+	UnknownLevel Level = iota - 3
 	TraceLevel
 	DebugLevel
 	InfoLevel
