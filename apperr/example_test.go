@@ -8,13 +8,14 @@ import (
 	"github.com/takuoki/golib/apperr"
 )
 
-func ExampleError() {
-	// buisiness logic
+func Example() {
+
+	// Buisiness logic
 	err := func() error {
 		return NotFound
 	}()
 
-	// error handling
+	// Error handling
 	e, ok := apperr.Extract(err)
 	if !ok {
 		e = NewInternalServerError(err)
