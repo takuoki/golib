@@ -5,92 +5,51 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/takuoki/golib/apperr"
 )
 
 func TestErr(t *testing.T) {
 	t.Run("client", func(t *testing.T) {
-		err := apperr.ClientError(1, "code", "message")
-		if err.Error() != "message" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "message", err.Error())
-		}
-		if err.Status() != 1 {
-			t.Errorf("result value does not match expected value (want=%v, actual=%v)", 1, err.Status())
-		}
-		if err.Code() != "code" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "code", err.Code())
-		}
-		if err.Message() != "message" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "message", err.Message())
-		}
-		if err.Log() != "" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "", err.Log())
-		}
-		if !err.IsClientError() {
-			t.Errorf("result value does not match expected value (want=%t, actual=%t)", true, err.IsClientError())
-		}
-		if err.IsServerError() {
-			t.Errorf("result value does not match expected value (want=%t, actual=%t)", false, err.IsServerError())
-		}
+		err := apperr.NewClientError(1, "code", "message")
+		assert.Equal(t, "message", err.Error(), "Error is not equal.")
+		assert.Equal(t, 1, err.Status(), "Etatus is not equal.")
+		assert.Equal(t, "code", err.Code(), "Code is not equal.")
+		assert.Equal(t, "message", err.Message(), "Message is not equal.")
+		assert.Equal(t, "", err.Log(), "Log is not equal.")
+		assert.Equal(t, apperr.ClientError, err.Type(), "Type is not equal.")
 	})
 	t.Run("server", func(t *testing.T) {
-		err := apperr.ServerError(1, "code", "message", "log")
-		if err.Error() != "message" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "message", err.Error())
-		}
-		if err.Status() != 1 {
-			t.Errorf("result value does not match expected value (want=%v, actual=%v)", 1, err.Status())
-		}
-		if err.Code() != "code" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "code", err.Code())
-		}
-		if err.Message() != "message" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "message", err.Message())
-		}
-		if err.Log() != "log" {
-			t.Errorf("result value does not match expected value (want=%q, actual=%q)", "log", err.Log())
-		}
-		if err.IsClientError() {
-			t.Errorf("result value does not match expected value (want=%t, actual=%t)", false, err.IsClientError())
-		}
-		if !err.IsServerError() {
-			t.Errorf("result value does not match expected value (want=%t, actual=%t)", true, err.IsServerError())
-		}
+		err := apperr.NewServerError(1, "code", "message", "log")
+		assert.Equal(t, "message", err.Error(), "Error is not equal.")
+		assert.Equal(t, 1, err.Status(), "Status is not equal.")
+		assert.Equal(t, "code", err.Code(), "Code is not equal.")
+		assert.Equal(t, "message", err.Message(), "Message is not equal.")
+		assert.Equal(t, "log", err.Log(), "Log is not equal.")
+		assert.Equal(t, apperr.ServerError, err.Type(), "Type is not equal.")
 	})
 }
 
 func TestExtract(t *testing.T) {
 	t.Run("exist", func(t *testing.T) {
-		err := apperr.ServerError(1, "code", "message", "log")
+		err := apperr.NewServerError(1, "code", "message", "log")
 		err2 := fmt.Errorf("wrapped: %w", err)
 		err3 := fmt.Errorf("wrapped: %w", err2)
 		result, ok := apperr.Extract(err3)
-		if result == nil {
-			t.Error("result value must not be nil")
-		} else if result != err {
-			t.Errorf("result value does not match expected value (want=%+v, actual=%+v)", err, result)
+		if assert.NotNil(t, result, "Error is nil.") {
+			assert.Equal(t, err, result, "Error is not equal.")
 		}
-		if !ok {
-			t.Error("'ok' value must be true")
-		}
+		assert.True(t, ok, "Ok is not true.")
 	})
 	t.Run("not-exist", func(t *testing.T) {
 		err := errors.New("error")
 		result, ok := apperr.Extract(err)
-		if result != nil {
-			t.Error("result value must be nil")
-		}
-		if ok {
-			t.Error("'ok' value must be false")
-		}
+		assert.Nil(t, result, "Error is not nil.")
+		assert.False(t, ok, "Ok is not false.")
 	})
 	t.Run("nil", func(t *testing.T) {
 		result, ok := apperr.Extract(nil)
-		if result != nil {
-			t.Error("result value must be nil")
-		}
-		if ok {
-			t.Error("'ok' value must be false")
-		}
+		assert.Nil(t, result, "Error is not nil.")
+		assert.False(t, ok, "Ok is not false.")
 	})
 }

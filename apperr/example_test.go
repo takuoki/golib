@@ -17,7 +17,7 @@ func ExampleError() {
 	// error handling
 	e, ok := apperr.Extract(err)
 	if !ok {
-		e = ServerError(err)
+		e = NewInternalServerError(err)
 	}
 	if e.Log() != "" {
 		log.Println(e.Log())
@@ -39,12 +39,12 @@ func ExampleError() {
 // The following is assumed to be defined in each application.
 
 var (
-	NotFound   = apperr.ClientError(http.StatusNotFound, "E0001", "not found")
-	IDRequired = apperr.ClientError(http.StatusBadRequest, "E0002", "id is required")
+	NotFound   = apperr.NewClientError(http.StatusNotFound, "E0001", "not found")
+	IDRequired = apperr.NewClientError(http.StatusBadRequest, "E0002", "id is required")
 )
 
-func ServerError(err error) apperr.Err {
-	return apperr.ServerError(
+func NewInternalServerError(err error) apperr.Err {
+	return apperr.NewServerError(
 		http.StatusInternalServerError,
 		"S0001",
 		"internal server error",
