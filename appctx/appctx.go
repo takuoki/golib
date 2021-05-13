@@ -8,17 +8,17 @@ import (
 
 type contextKey string
 
-const requestIDContextKey contextKey = "request-id"
+const requestIDKey contextKey = "request-id"
 
-// SetRequestID sets requestID in the context.
-func SetRequestID(ctx context.Context, requestID string) context.Context {
-	return context.WithValue(ctx, requestIDContextKey, requestID)
+// WithRequestID returns a copy of the parent context with the requestID set.
+func WithRequestID(parent context.Context, requestID string) context.Context {
+	return context.WithValue(parent, requestIDKey, requestID)
 }
 
-// GetRequestID returns requestID from the context.
+// RequestID returns requestID from the context.
 // If it does not exists, returns an empty string.
-func GetRequestID(ctx context.Context) string {
-	if requestID, ok := ctx.Value(requestIDContextKey).(string); ok {
+func RequestID(ctx context.Context) string {
+	if requestID, ok := ctx.Value(requestIDKey).(string); ok {
 		return requestID
 	}
 	return ""
