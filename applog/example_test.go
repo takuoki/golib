@@ -2,6 +2,7 @@ package applog_test
 
 import (
 	"context"
+	"log"
 	"os"
 
 	"github.com/takuoki/golib/applog"
@@ -14,9 +15,13 @@ func Example() {
 	imageTag := "v1.0.0"
 
 	// Create logger
+	lv, err := applog.ParseLevel(logLevel)
+	if err != nil {
+		log.Fatalf("Fail to parse log level (logLevel=%q): %v", logLevel, err)
+	}
 	logger := applog.NewBasicLogger(
 		os.Stdout,
-		applog.LevelOption(applog.ParseLevel(logLevel)),
+		applog.LevelOption(lv),
 		applog.TimeFormatOption("YYYY-MM-DD HH:mm:ss"), // This is invalid format for example test.
 		applog.ImageTagOption(imageTag),
 	)

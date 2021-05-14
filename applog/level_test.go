@@ -11,6 +11,7 @@ func TestParseLevel(t *testing.T) {
 	testcase := map[string]struct {
 		in   string
 		want applog.Level
+		err  bool
 	}{
 		"critical": {in: "critical", want: applog.CriticalLevel},
 		"error":    {in: "error", want: applog.ErrorLevel},
@@ -18,12 +19,18 @@ func TestParseLevel(t *testing.T) {
 		"info":     {in: "info", want: applog.InfoLevel},
 		"debug":    {in: "debug", want: applog.DebugLevel},
 		"trace":    {in: "trace", want: applog.TraceLevel},
-		"empty":    {in: "", want: applog.UnknownLevel},
+		"empty":    {in: "", want: applog.UnknownLevel, err: true},
 	}
 
 	for name, c := range testcase {
 		t.Run(name, func(t *testing.T) {
-			assert.Equal(t, c.want, applog.ParseLevel(c.in))
+			lv, err := applog.ParseLevel(c.in)
+			assert.Equal(t, c.want, lv)
+			if c.err {
+				assert.NotNil(t, err, "err is nil")
+			} else {
+				assert.Nil(t, err, "err is not nil")
+			}
 		})
 	}
 }

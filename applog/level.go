@@ -1,5 +1,7 @@
 package applog
 
+import "errors"
+
 // Level is the log level.
 // Higher levels are more important.
 type Level int
@@ -16,22 +18,23 @@ const (
 )
 
 // ParseLevel returns the log level based on the string.
-func ParseLevel(lv string) Level {
+// If an undefined string is specified, an error will be returned.
+func ParseLevel(lv string) (Level, error) {
 	switch lv {
 	case "critical", "CRITICAL", "Critical":
-		return CriticalLevel
+		return CriticalLevel, nil
 	case "error", "ERROR", "Error":
-		return ErrorLevel
+		return ErrorLevel, nil
 	case "warn", "WARN", "Warn":
-		return WarnLevel
+		return WarnLevel, nil
 	case "info", "INFO", "Info":
-		return InfoLevel
+		return InfoLevel, nil
 	case "debug", "DEBUG", "Debug":
-		return DebugLevel
+		return DebugLevel, nil
 	case "trace", "TRACE", "Trace":
-		return TraceLevel
+		return TraceLevel, nil
 	}
-	return UnknownLevel
+	return UnknownLevel, errors.New("invalid string for the log level")
 }
 
 // String returns a string of the log level.
