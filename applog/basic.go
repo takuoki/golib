@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 
 	"github.com/takuoki/golib/appctx"
 )
 
 type basicLogger struct {
+	mu         sync.Mutex
 	out        io.Writer
 	level      Level
 	timeFormat string
@@ -111,6 +113,9 @@ func (l *basicLogger) Print(ctx context.Context, lv Level, msg string, labels ma
 		Labels:    labels,
 	}
 	jsonLog, _ := json.Marshal(log)
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	fmt.Fprintln(l.out, string(jsonLog))
 }
 
