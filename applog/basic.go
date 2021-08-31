@@ -28,7 +28,8 @@ func NewBasicLogger(w io.Writer, opts ...Option) Logger {
 		timeFormat: time.RFC3339,
 	}
 	for _, opt := range opts {
-		opt(logger)
+		// basicLogger option never returns an error
+		_ = opt(logger)
 	}
 	return logger
 }
