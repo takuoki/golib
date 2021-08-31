@@ -1,4 +1,4 @@
-package appnotice
+package notice
 
 type nopNotifier struct{}
 
