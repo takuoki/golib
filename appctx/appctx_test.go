@@ -14,11 +14,26 @@ func TestRequestID(t *testing.T) {
 		ctx := context.Background()
 		ctx = appctx.WithRequestID(ctx, testRequestID)
 		result := appctx.RequestID(ctx)
-		assert.Equal(t, testRequestID, result, "RequestID is not equal.")
+		assert.Equal(t, testRequestID, result, "RequestID is not equal")
 	})
 	t.Run("empty", func(t *testing.T) {
 		ctx := context.Background()
 		result := appctx.RequestID(ctx)
-		assert.Empty(t, result, "RequestID is not empty.")
+		assert.Empty(t, result, "RequestID is not empty")
+	})
+}
+
+func TestAuthorization(t *testing.T) {
+	t.Run("succsess", func(t *testing.T) {
+		testAuthorization := "test-authorization"
+		ctx := context.Background()
+		ctx = appctx.WithAuthorization(ctx, testAuthorization)
+		result := appctx.Authorization(ctx)
+		assert.Equal(t, testAuthorization, result, "Authorization is not equal")
+	})
+	t.Run("empty", func(t *testing.T) {
+		ctx := context.Background()
+		result := appctx.Authorization(ctx)
+		assert.Empty(t, result, "Authorization is not empty")
 	})
 }
