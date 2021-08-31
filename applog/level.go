@@ -37,6 +37,16 @@ func ParseLevel(lv string) (Level, error) {
 	return UnknownLevel, errors.New("invalid string for the log level")
 }
 
+// ParseLevelWithDefault returns the log level based on the string.
+// If an undefined string is specified, defaltLevel will be returned.
+func ParseLevelWithDefault(lv string, defaltLevel Level) Level {
+	l, err := ParseLevel(lv)
+	if err != nil {
+		return defaltLevel
+	}
+	return l
+}
+
 // String returns a string of the log level.
 func (lv Level) String() string {
 	switch lv {
