@@ -69,7 +69,7 @@ type RequestLogTestSuite struct {
 
 func (s *RequestLogTestSuite) TestUnary_ExistRequestID() {
 	md := metadata.New(map[string]string{requestIDKey: requestID})
-	s.Client.Ping(
+	_, _ = s.Client.Ping(
 		metadata.NewOutgoingContext(s.SimpleCtx(), md),
 		&pb_testproto.PingRequest{Value: "exist-request-id", SleepTimeMs: 9999},
 		grpc.Header(&md),
@@ -77,12 +77,12 @@ func (s *RequestLogTestSuite) TestUnary_ExistRequestID() {
 }
 
 func (s *RequestLogTestSuite) TestUnary_NotExistRequestID() {
-	s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "not-exist-request-id", SleepTimeMs: 9999})
+	_, _ = s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "not-exist-request-id", SleepTimeMs: 9999})
 }
 
 func (s *RequestLogTestSuite) TestUnary_ExistAuthorization() {
 	md := metadata.New(map[string]string{authorizationKey: authorization})
-	s.Client.Ping(
+	_, _ = s.Client.Ping(
 		metadata.NewOutgoingContext(s.SimpleCtx(), md),
 		&pb_testproto.PingRequest{Value: "exist-authorization", SleepTimeMs: 9999},
 		grpc.Header(&md),

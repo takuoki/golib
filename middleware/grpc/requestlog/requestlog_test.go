@@ -41,7 +41,7 @@ type RequestLogTestSuite struct {
 
 func (s *RequestLogTestSuite) TestUnary_RequestLog() {
 	s.buf.Reset()
-	s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "something", SleepTimeMs: 9999})
+	_, _ = s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "something", SleepTimeMs: 9999})
 	assert.Regexp(
 		s.T(),
 		`^{"time":"\d{2}:\d{2}:\d{2}","level":"INFO","message":"request log","labels":{"content_type":"application/grpc","ip_address":"127.0.0.1:[0-9]+","service_method":"/mwitkow.testproto.TestService/Ping","user_agent":"grpc-go/.+"}}`+"\n$",
