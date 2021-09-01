@@ -11,9 +11,12 @@ import (
 func Example() {
 
 	// Buisiness logic
-	err := func() error {
+	err := func(id string) error {
+		if id == "" {
+			return IDRequired
+		}
 		return NotFound
-	}()
+	}("id1")
 
 	// Error handling
 	e, ok := apperr.Extract(err)
