@@ -6,20 +6,20 @@ type Option func(Logger) error
 // LevelOption sets the log level that the logger outputs.
 func LevelOption(lv Level) Option {
 	return func(l Logger) error {
-		return l.SetLevel(lv)
+		return l.setLevel(lv)
 	}
 }
 
 // TimeFormatOption sets the time format that the logger outputs.
 func TimeFormatOption(format string) Option {
 	return func(l Logger) error {
-		return l.SetTimeFormat(format)
+		return l.setTimeFormat(format)
 	}
 }
 
 // ImageTagOption sets the image tag that the logger outputs.
 func ImageTagOption(tag string) Option {
 	return func(l Logger) error {
-		return l.SetImageTag(tag)
+		return l.setImageTag(tag)
 	}
 }

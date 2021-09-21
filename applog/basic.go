@@ -34,17 +34,17 @@ func NewBasicLogger(w io.Writer, opts ...Option) Logger {
 	return logger
 }
 
-func (l *basicLogger) SetLevel(lv Level) error {
+func (l *basicLogger) setLevel(lv Level) error {
 	l.level = lv
 	return nil
 }
 
-func (l *basicLogger) SetTimeFormat(format string) error {
+func (l *basicLogger) setTimeFormat(format string) error {
 	l.timeFormat = format
 	return nil
 }
 
-func (l *basicLogger) SetImageTag(tag string) error {
+func (l *basicLogger) setImageTag(tag string) error {
 	l.imageTag = tag
 	return nil
 }

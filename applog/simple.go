@@ -30,16 +30,16 @@ func NewSimpleLogger(w io.Writer, opts ...Option) (Logger, error) {
 	return logger, nil
 }
 
-func (l *simpleLogger) SetLevel(lv Level) error {
+func (l *simpleLogger) setLevel(lv Level) error {
 	l.level = lv
 	return nil
 }
 
-func (l *simpleLogger) SetTimeFormat(format string) error {
+func (l *simpleLogger) setTimeFormat(format string) error {
 	return errors.New("TimeFormatOption is not available for simpleLogger")
 }
 
-func (l *simpleLogger) SetImageTag(tag string) error {
+func (l *simpleLogger) setImageTag(tag string) error {
 	return errors.New("ImageTagOption is not available for simpleLogger")
 }
 
