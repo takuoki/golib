@@ -26,7 +26,7 @@ type Logger interface {
 	Print(ctx context.Context, lv Level, msg string, labels map[string]string)
 
 	// Option setter
-	setLevel(lv Level) error
-	setTimeFormat(format string) error
-	setImageTag(tag string) error
+	SetLevel(lv Level) error
+	SetTimeFormat(format string) error
+	SetImageTag(tag string) error
 }
