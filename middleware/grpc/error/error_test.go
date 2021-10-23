@@ -49,9 +49,9 @@ type assertingPingService struct {
 func (s *assertingPingService) Ping(ctx context.Context, ping *pb_testproto.PingRequest) (*pb_testproto.PingResponse, error) {
 	switch ping.Value {
 	case "apperr-client":
-		return nil, apperr.NewClientError(int(codes.InvalidArgument), apperrClientCode, apperrClientMessage)
+		return nil, apperr.NewClientError(codes.InvalidArgument, apperrClientCode, apperrClientMessage)
 	case "apperr-server":
-		return nil, apperr.NewServerError(int(codes.Internal), apperrServerCode, apperrServerMessage, apperrServerLog)
+		return nil, apperr.NewServerError(codes.Internal, apperrServerCode, apperrServerMessage, apperrServerLog)
 	case "general-error":
 		return nil, errors.New(generalErrorMessage)
 	case "notification-error":

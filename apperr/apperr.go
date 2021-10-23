@@ -4,13 +4,17 @@
 // client or server error from the wrapped error.
 package apperr
 
-import "errors"
+import (
+	"errors"
+
+	"google.golang.org/grpc/codes"
+)
 
 // Err is a interface that represents an error.
 type Err interface {
 	Error() string
-	Status() int
-	Code() string
+	Code() codes.Code
+	DetailCode() string
 	Message() string
 	Log() string
 	Type() Type
