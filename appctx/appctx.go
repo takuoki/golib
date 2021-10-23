@@ -11,6 +11,7 @@ type contextKey string
 // List of contextKey
 const (
 	requestIDKey     contextKey = "request-id"
+	userIDKey        contextKey = "user-id"
 	authorizationKey contextKey = "authorization"
 )
 
@@ -24,6 +25,20 @@ func WithRequestID(parent context.Context, requestID string) context.Context {
 func RequestID(ctx context.Context) string {
 	if requestID, ok := ctx.Value(requestIDKey).(string); ok {
 		return requestID
+	}
+	return ""
+}
+
+// WithUserID returns a copy of the parent context with the userID set.
+func WithUserID(parent context.Context, userID string) context.Context {
+	return context.WithValue(parent, userIDKey, userID)
+}
+
+// UserID returns userID from the context.
+// If it does not exists, returns an empty string.
+func UserID(ctx context.Context) string {
+	if userID, ok := ctx.Value(userIDKey).(string); ok {
+		return userID
 	}
 	return ""
 }
