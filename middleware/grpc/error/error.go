@@ -33,9 +33,9 @@ func UnaryServerInterceptor(domain, internalServerErrorCode string, logger applo
 				}
 			}
 
-			st := status.New(codes.Code(e.Status()), e.Message())
+			st := status.New(e.Code(), e.Message())
 			st, _ = st.WithDetails(&errdetails.ErrorInfo{
-				Reason: e.Code(),
+				Reason: e.DetailCode(),
 				Domain: domain,
 			})
 			return nil, st.Err()
@@ -46,7 +46,7 @@ func UnaryServerInterceptor(domain, internalServerErrorCode string, logger applo
 
 func newInternalServerError(code string, err error) apperr.Err {
 	return apperr.NewServerError(
-		int(codes.Internal),
+		codes.Internal,
 		code,
 		"internal server error",
 		err.Error(),

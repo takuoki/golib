@@ -1,19 +1,21 @@
 package apperr
 
+import "google.golang.org/grpc/codes"
+
 type clientError struct {
-	status  int
-	code    string
-	message string
+	code       codes.Code
+	detailCode string
+	message    string
 }
 
 // NewClientError creates new client error.
-// For RESTful API, set the HTTP status code to `status`.
-// Set the error code (ex. "E0001") that the client can handle to `code`.
-func NewClientError(status int, code, message string) Err {
+// Set the gRPC code to `code`.
+// Set the error detail code (ex. "E0001") that the client can handle to `detailCode`.
+func NewClientError(code codes.Code, detailCode, message string) Err {
 	return &clientError{
-		status:  status,
-		code:    code,
-		message: message,
+		code:       code,
+		detailCode: detailCode,
+		message:    message,
 	}
 }
 
@@ -22,14 +24,14 @@ func (e *clientError) Error() string {
 	return e.message
 }
 
-// Status returns status value.
-func (e *clientError) Status() int {
-	return e.status
+// Code returns code value.
+func (e *clientError) Code() codes.Code {
+	return e.code
 }
 
-// Code returns code string.
-func (e *clientError) Code() string {
-	return e.code
+// DetailCode returns detail code string.
+func (e *clientError) DetailCode() string {
+	return e.detailCode
 }
 
 // Message returns message string.

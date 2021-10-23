@@ -3,9 +3,9 @@ package apperr_test
 import (
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/takuoki/golib/apperr"
+	"google.golang.org/grpc/codes"
 )
 
 func Example() {
@@ -30,7 +30,7 @@ func Example() {
 		Code    string
 		Message string
 	}{
-		Code:    e.Code(),
+		Code:    e.DetailCode(),
 		Message: e.Message(),
 	}
 
@@ -43,13 +43,13 @@ func Example() {
 // The following is assumed to be defined in each application.
 
 var (
-	NotFound   = apperr.NewClientError(http.StatusNotFound, "E0001", "not found")
-	IDRequired = apperr.NewClientError(http.StatusBadRequest, "E0002", "id is required")
+	NotFound   = apperr.NewClientError(codes.NotFound, "E0001", "not found")
+	IDRequired = apperr.NewClientError(codes.InvalidArgument, "E0002", "id is required")
 )
 
 func NewInternalServerError(err error) apperr.Err {
 	return apperr.NewServerError(
-		http.StatusInternalServerError,
+		codes.Internal,
 		"S0001",
 		"internal server error",
 		err.Error(),

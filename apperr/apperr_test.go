@@ -7,23 +7,24 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/takuoki/golib/apperr"
+	"google.golang.org/grpc/codes"
 )
 
 func TestErr(t *testing.T) {
 	t.Run("client", func(t *testing.T) {
-		err := apperr.NewClientError(1, "code", "message")
+		err := apperr.NewClientError(codes.InvalidArgument, "code", "message")
 		assert.Equal(t, "message", err.Error(), "Error is not equal.")
-		assert.Equal(t, 1, err.Status(), "Etatus is not equal.")
-		assert.Equal(t, "code", err.Code(), "Code is not equal.")
+		assert.Equal(t, codes.InvalidArgument, err.Code(), "Code is not equal.")
+		assert.Equal(t, "code", err.DetailCode(), "DetailCode is not equal.")
 		assert.Equal(t, "message", err.Message(), "Message is not equal.")
 		assert.Equal(t, "", err.Log(), "Log is not equal.")
 		assert.Equal(t, apperr.ClientError, err.Type(), "Type is not equal.")
 	})
 	t.Run("server", func(t *testing.T) {
-		err := apperr.NewServerError(1, "code", "message", "log")
+		err := apperr.NewServerError(codes.Internal, "code", "message", "log")
 		assert.Equal(t, "message", err.Error(), "Error is not equal.")
-		assert.Equal(t, 1, err.Status(), "Status is not equal.")
-		assert.Equal(t, "code", err.Code(), "Code is not equal.")
+		assert.Equal(t, codes.Internal, err.Code(), "Code is not equal.")
+		assert.Equal(t, "code", err.DetailCode(), "DetailCode is not equal.")
 		assert.Equal(t, "message", err.Message(), "Message is not equal.")
 		assert.Equal(t, "log", err.Log(), "Log is not equal.")
 		assert.Equal(t, apperr.ServerError, err.Type(), "Type is not equal.")
