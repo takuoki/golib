@@ -1,5 +1,6 @@
 // Package grpc_context is a generic server-side gRPC middleware
 // that sets some values to context.
+// !!!WARNING!!! This middleware is deprecated.
 package grpc_context
 
 import (
