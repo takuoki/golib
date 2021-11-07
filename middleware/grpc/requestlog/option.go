@@ -20,6 +20,7 @@ func defaultRequestIDFunc() (string, error) {
 	return u.String(), nil
 }
 
+// Option is an option when creating middleware.
 type Option interface {
 	apply(*options)
 }
@@ -38,12 +39,16 @@ func newFuncOption(f func(*options)) *funcOption {
 	}
 }
 
+// RequestIDKey is a key option for the request ID specified in the metadata.
+// The default is "Request-ID".
 func RequestIDKey(key string) Option {
 	return newFuncOption(func(o *options) {
 		o.requestIDKey = key
 	})
 }
 
+// RequestIDFunc is a function option to automatically generate a request ID
+// when it is not specified. The default is a function that generates a UUID.
 func RequestIDFunc(fn func() (string, error)) Option {
 	return newFuncOption(func(o *options) {
 		o.requestIDFunc = fn
