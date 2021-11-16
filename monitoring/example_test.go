@@ -21,10 +21,11 @@ func Example() {
 	// Output:
 	// |    NAME    | ALLOC (MB) | TOTALALLOC (MB) | SYS (MB) |
 	// |------------|------------|-----------------|----------|
-	// | main start |          0 |               0 |        9 |
-	// | foo start  |          0 |               0 |        9 |
-	// | foo end    |          0 |               0 |        9 |
-	// | main end   |          0 |               0 |        9 |
+
+	// | main start |          0 |               0 |       64 |
+	// | foo start  |          0 |               0 |       64 |
+	// | foo end    |          0 |               0 |       64 |
+	// | main end   |          0 |               0 |       64 |
 }
 
 func foo(ctx context.Context) {
