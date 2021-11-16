@@ -77,7 +77,9 @@ func Output(ctx context.Context, w io.Writer, formatFunc OutputFormatFunc) {
 func OutputFile(ctx context.Context, dirPath string, formatFunc OutputFormatFunc) error {
 
 	if dir, err := os.Stat(dirPath); os.IsNotExist(err) {
-		os.MkdirAll(dirPath, os.ModePerm)
+		if err := os.MkdirAll(dirPath, os.ModePerm); err != nil {
+			return fmt.Errorf("failed to make directory: %w", err)
+		}
 	} else if !dir.IsDir() {
 		return errors.New("the same file as the output directory name exists")
 	}
