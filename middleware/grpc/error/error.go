@@ -12,11 +12,10 @@ import (
 
 	"github.com/takuoki/golib/apperr"
 	"github.com/takuoki/golib/applog"
-	"github.com/takuoki/golib/notice"
 )
 
 // UnaryServerInterceptor returns a gRPC middleware that converts standard error to gRPC error.
-func UnaryServerInterceptor(domain, internalServerErrorCode string, logger applog.Logger, notifier notice.Notifier) grpc.UnaryServerInterceptor {
+func UnaryServerInterceptor(domain, internalServerErrorCode string, logger applog.Logger) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 		resp, err := handler(ctx, req)
 		if err != nil {
@@ -26,11 +25,6 @@ func UnaryServerInterceptor(domain, internalServerErrorCode string, logger applo
 			}
 			if e.Log() != "" {
 				logger.Error(ctx, e.Log())
-			}
-			if e.Type() == apperr.ServerError {
-				if err := notifier.Error(err); err != nil {
-					logger.Errorf(ctx, "failed to send nortification: %v", err)
-				}
 			}
 
 			st := status.New(e.Code(), e.Message())

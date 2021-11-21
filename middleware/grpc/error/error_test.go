@@ -4,9 +4,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"fmt"
-	"io"
-	"sync"
 	"testing"
 
 	grpc_testing "github.com/grpc-ecosystem/go-grpc-middleware/testing"
@@ -21,7 +18,6 @@ import (
 	"github.com/takuoki/golib/apperr"
 	"github.com/takuoki/golib/applog"
 	grpc_error "github.com/takuoki/golib/middleware/grpc/error"
-	"github.com/takuoki/golib/notice"
 )
 
 const (
@@ -61,8 +57,7 @@ func (s *assertingPingService) Ping(ctx context.Context, ping *pb_testproto.Ping
 }
 
 func TestErrorHandlerTestSuite(t *testing.T) {
-	lBuf := &bytes.Buffer{}
-	nBuf := &bytes.Buffer{}
+	buf := &bytes.Buffer{}
 	s := &ErrorHandlerTestSuite{
 		InterceptorTestSuite: &grpc_testing.InterceptorTestSuite{
 			TestService: &assertingPingService{&grpc_testing.TestPingService{T: t}, t},
@@ -71,36 +66,30 @@ func TestErrorHandlerTestSuite(t *testing.T) {
 					grpc_error.UnaryServerInterceptor(
 						domain,
 						internalServerErrorCode,
-						applog.NewBasicLogger(lBuf, applog.TimeFormatOption("15:04:05")),
-						newTestNotifier(nBuf),
+						applog.NewBasicLogger(buf, applog.TimeFormatOption("15:04:05")),
 					),
 				),
 			},
 		},
-		lBuf: lBuf,
-		nBuf: nBuf,
+		buf: buf,
 	}
 	suite.Run(t, s)
 }
 
 type ErrorHandlerTestSuite struct {
 	*grpc_testing.InterceptorTestSuite
-	lBuf *bytes.Buffer
-	nBuf *bytes.Buffer
+	buf *bytes.Buffer
 }
 
 func (s *ErrorHandlerTestSuite) TestUnary_Success() {
-	s.lBuf.Reset()
-	s.nBuf.Reset()
+	s.buf.Reset()
 	_, err := s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "success", SleepTimeMs: 9999})
 	assert.Nil(s.T(), err)
-	assert.Empty(s.T(), s.lBuf.String(), "log must be empty")
-	assert.Empty(s.T(), s.nBuf.String(), "notification must be empty")
+	assert.Empty(s.T(), s.buf.String(), "log must be empty")
 }
 
 func (s *ErrorHandlerTestSuite) TestUnary_ApperrClient() {
-	s.lBuf.Reset()
-	s.nBuf.Reset()
+	s.buf.Reset()
 	_, err := s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "apperr-client", SleepTimeMs: 9999})
 	if st, ok := status.FromError(err); ok {
 		assert.Equal(s.T(), apperrClientStatus, st.Code(), "status doesn't match")
@@ -115,13 +104,11 @@ func (s *ErrorHandlerTestSuite) TestUnary_ApperrClient() {
 	} else {
 		s.T().Error("status.Status must be retrievable from error")
 	}
-	assert.Empty(s.T(), s.lBuf.String(), "log must be empty")
-	assert.Empty(s.T(), s.nBuf.String(), "notification must be empty")
+	assert.Empty(s.T(), s.buf.String(), "log must be empty")
 }
 
 func (s *ErrorHandlerTestSuite) TestUnary_ApperrServer() {
-	s.lBuf.Reset()
-	s.nBuf.Reset()
+	s.buf.Reset()
 	_, err := s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "apperr-server", SleepTimeMs: 9999})
 	if st, ok := status.FromError(err); ok {
 		assert.Equal(s.T(), apperrServerStatus, st.Code(), "status doesn't match")
@@ -136,13 +123,11 @@ func (s *ErrorHandlerTestSuite) TestUnary_ApperrServer() {
 	} else {
 		s.T().Error("status.Status must be retrievable from error")
 	}
-	assert.Regexp(s.T(), `^{"time":"\d{2}:\d{2}:\d{2}","level":"ERROR","message":"this is apperr server log"}`+"\n$", s.lBuf.String(), "log message doesn't match")
-	assert.Equal(s.T(), "ERROR: this is apperr server", s.nBuf.String(), "notification doesn't match")
+	assert.Regexp(s.T(), `^{"time":"\d{2}:\d{2}:\d{2}","level":"ERROR","message":"this is apperr server log"}`+"\n$", s.buf.String(), "log message doesn't match")
 }
 
 func (s *ErrorHandlerTestSuite) TestUnary_GeneralErr() {
-	s.lBuf.Reset()
-	s.nBuf.Reset()
+	s.buf.Reset()
 	_, err := s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "general-error", SleepTimeMs: 9999})
 	if st, ok := status.FromError(err); ok {
 		assert.Equal(s.T(), codes.Internal, st.Code(), "status doesn't match")
@@ -157,53 +142,5 @@ func (s *ErrorHandlerTestSuite) TestUnary_GeneralErr() {
 	} else {
 		s.T().Error("status.Status must be retrievable from error")
 	}
-	assert.Regexp(s.T(), `^{"time":"\d{2}:\d{2}:\d{2}","level":"ERROR","message":"this is general error"}`+"\n$", s.lBuf.String(), "log message doesn't match")
-	assert.Equal(s.T(), "ERROR: this is general error", s.nBuf.String(), "notification doesn't match")
-}
-
-func (s *ErrorHandlerTestSuite) TestUnary_NotificationError() {
-	s.lBuf.Reset()
-	s.nBuf.Reset()
-	_, err := s.Client.Ping(s.SimpleCtx(), &pb_testproto.PingRequest{Value: "notification-error", SleepTimeMs: 9999})
-	if st, ok := status.FromError(err); ok {
-		assert.Equal(s.T(), codes.Internal, st.Code(), "status doesn't match")
-		assert.Equal(s.T(), "internal server error", st.Message(), "message doesn't match")
-		if assert.Len(s.T(), st.Details(), 1, "length of error details") {
-			if ed, ok := st.Details()[0].(*errdetails.ErrorInfo); ok {
-				assert.Equal(s.T(), internalServerErrorCode, ed.Reason, "code doesn't match")
-			} else {
-				s.T().Error("error detail must be cast to errdetails.ErrorInfo")
-			}
-		}
-	} else {
-		s.T().Error("status.Status must be retrievable from error")
-	}
-	assert.Regexp(s.T(), `{"time":"\d{2}:\d{2}:\d{2}","level":"ERROR","message":"failed to send nortification: error"}`+"\n", s.lBuf.String(), "log message doesn't match")
-	assert.Empty(s.T(), s.nBuf.String(), "notification must be empty")
-}
-
-type testNotifier struct {
-	mu  sync.Mutex
-	out io.Writer
-}
-
-func newTestNotifier(w io.Writer) notice.Notifier {
-	return &testNotifier{out: w}
-}
-
-func (n *testNotifier) Error(err error) error {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	if err.Error() == notificationErrorMessage {
-		return errors.New("error")
-	}
-	fmt.Fprintf(n.out, "ERROR: %v", err)
-	return nil
-}
-
-func (n *testNotifier) Critical(err error) error {
-	n.mu.Lock()
-	defer n.mu.Unlock()
-	fmt.Fprintf(n.out, "CRITICAL: %v", err)
-	return nil
+	assert.Regexp(s.T(), `^{"time":"\d{2}:\d{2}:\d{2}","level":"ERROR","message":"this is general error"}`+"\n$", s.buf.String(), "log message doesn't match")
 }
