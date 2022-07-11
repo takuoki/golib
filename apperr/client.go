@@ -1,6 +1,10 @@
 package apperr
 
-import "google.golang.org/grpc/codes"
+import (
+	"google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
 type clientError struct {
 	code       codes.Code
@@ -47,4 +51,15 @@ func (e *clientError) Log() string {
 // Type returns error type.
 func (e *clientError) Type() Type {
 	return ClientError
+}
+
+// GRPCError returns gRPC error.
+func (e *clientError) GRPCError(domain string) error {
+	st := status.New(e.Code(), e.Message())
+	st, _ = st.WithDetails(&errdetails.ErrorInfo{
+		Reason: e.DetailCode(),
+		Domain: domain,
+	})
+
+	return st.Err()
 }

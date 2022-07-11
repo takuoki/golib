@@ -7,6 +7,7 @@ import (
 	"github.com/takuoki/golib/monitoring"
 )
 
+// nolint:govet
 func Example() {
 
 	ctx := context.Background()

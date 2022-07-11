@@ -5,10 +5,8 @@ package grpc_error
 import (
 	"context"
 
-	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/takuoki/golib/apperr"
 	"github.com/takuoki/golib/applog"
@@ -27,12 +25,7 @@ func UnaryServerInterceptor(domain, internalServerErrorCode string, logger applo
 				logger.Error(ctx, e.Log())
 			}
 
-			st := status.New(e.Code(), e.Message())
-			st, _ = st.WithDetails(&errdetails.ErrorInfo{
-				Reason: e.DetailCode(),
-				Domain: domain,
-			})
-			return nil, st.Err()
+			return nil, e.GRPCError(domain)
 		}
 		return resp, nil
 	}
