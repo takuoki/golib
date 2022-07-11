@@ -1,6 +1,7 @@
 package apperr_test
 
 import (
+	"errors"
 	"fmt"
 	"log"
 
@@ -38,6 +39,41 @@ func Example() {
 
 	// Output:
 	// {Code:E0001 Message:not found}
+}
+
+func ExampleExtractFromGRPCError() {
+
+	callGrpcAPI := func(e apperr.Err) error {
+		return e.GRPCError("domain")
+	}
+
+	// Client error
+	err := callGrpcAPI(NotFound)
+	if e, ok := apperr.ExtractFromGRPCError(err); ok {
+		fmt.Printf("Code: %s, DetailCode: %s, Message: %s\n", e.Code(), e.DetailCode(), e.Message())
+	}
+
+	// Server error
+	err = callGrpcAPI(NewInternalServerError(errors.New("error")))
+	if e, ok := apperr.ExtractFromGRPCError(err); ok {
+		fmt.Printf("Code: %s, DetailCode: %s, Message: %s\n", e.Code(), e.DetailCode(), e.Message())
+	}
+
+	// nil error
+	err = nil
+	if e, ok := apperr.ExtractFromGRPCError(err); ok {
+		fmt.Printf("Code: %s, DetailCode: %s, Message: %s\n", e.Code(), e.DetailCode(), e.Message())
+	}
+
+	// non-gRPC error
+	err = errors.New("error")
+	if e, ok := apperr.ExtractFromGRPCError(err); ok {
+		fmt.Printf("Code: %s, DetailCode: %s, Message: %s\n", e.Code(), e.DetailCode(), e.Message())
+	}
+
+	// Output:
+	// Code: NotFound, DetailCode: E0001, Message: not found
+	// Code: Internal, DetailCode: S0001, Message: internal server error
 }
 
 // The following is assumed to be defined in each application.
