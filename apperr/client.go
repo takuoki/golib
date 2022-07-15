@@ -1,6 +1,7 @@
 package apperr
 
 import (
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -51,6 +52,11 @@ func (e *clientError) Log() string {
 // Type returns error type.
 func (e *clientError) Type() Type {
 	return ClientError
+}
+
+// HTTPStatus returns HTTP status code.
+func (e *clientError) HTTPStatus() int {
+	return runtime.HTTPStatusFromCode(e.code)
 }
 
 // GRPCError returns gRPC error.

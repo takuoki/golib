@@ -21,6 +21,7 @@ type Err interface {
 	Log() string
 	Type() Type
 
+	HTTPStatus() int
 	GRPCError(domain string) error
 }
 
