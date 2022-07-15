@@ -19,6 +19,7 @@ func TestErr(t *testing.T) {
 		assert.Equal(t, "message", err.Message(), "Message is not equal.")
 		assert.Equal(t, "", err.Log(), "Log is not equal.")
 		assert.Equal(t, apperr.ClientError, err.Type(), "Type is not equal.")
+		assert.Equal(t, 400, err.HTTPStatus(), "HTTP status is not equal.")
 	})
 	t.Run("server", func(t *testing.T) {
 		err := apperr.NewServerError(codes.Internal, "code", "message", "log")
@@ -28,6 +29,7 @@ func TestErr(t *testing.T) {
 		assert.Equal(t, "message", err.Message(), "Message is not equal.")
 		assert.Equal(t, "log", err.Log(), "Log is not equal.")
 		assert.Equal(t, apperr.ServerError, err.Type(), "Type is not equal.")
+		assert.Equal(t, 500, err.HTTPStatus(), "HTTP status is not equal.")
 	})
 }
 
