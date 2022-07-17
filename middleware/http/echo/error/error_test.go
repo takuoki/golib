@@ -18,7 +18,7 @@ import (
 	echo_error "github.com/takuoki/golib/middleware/http/echo/error"
 )
 
-func TestAddTrailingSlash(t *testing.T) {
+func TestMiddleware(t *testing.T) {
 
 	const internalServerErrorCode = "S0001"
 
@@ -50,6 +50,7 @@ func TestAddTrailingSlash(t *testing.T) {
 			wantLog:    "server error\n",
 		},
 	}
+
 	for name, tc := range testcases {
 		name := name
 		tc := tc
