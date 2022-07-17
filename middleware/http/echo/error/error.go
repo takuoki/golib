@@ -19,12 +19,13 @@ import (
 func Middleware(internalServerErrorCode string, logger applog.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			ctx := echoctx.New(c).GetContext()
 			if err := next(c); err != nil {
 				e, ok := apperr.Extract(err)
 				if !ok {
 					if herr, ok := err.(*echo.HTTPError); ok {
 						e = apperr.NewClientError(
-							codeFromHTTPStatus(echoctx.New(c).GetContext(), herr.Code, logger),
+							codeFromHTTPStatus(ctx, herr.Code, logger),
 							"-",
 							fmt.Sprintf("%v", herr.Message),
 						)
@@ -33,7 +34,7 @@ func Middleware(internalServerErrorCode string, logger applog.Logger) echo.Middl
 					}
 				}
 				if e.Log() != "" {
-					logger.Error(c.Request().Context(), e.Log())
+					logger.Error(ctx, e.Log())
 				}
 
 				return c.JSON(e.HTTPStatus(), struct {
