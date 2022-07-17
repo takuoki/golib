@@ -10,10 +10,12 @@ import (
 	echo "github.com/labstack/echo/v4"
 	"google.golang.org/grpc/codes"
 
+	"github.com/takuoki/golib/appctx/echoctx"
 	"github.com/takuoki/golib/apperr"
 	"github.com/takuoki/golib/applog"
 )
 
+// Middleware returns a echo middleware that converts standard error to HTTP error.
 func Middleware(internalServerErrorCode string, logger applog.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
@@ -22,7 +24,7 @@ func Middleware(internalServerErrorCode string, logger applog.Logger) echo.Middl
 				if !ok {
 					if herr, ok := err.(*echo.HTTPError); ok {
 						e = apperr.NewClientError(
-							codeFromHTTPStatus(c.Request().Context(), herr.Code, logger),
+							codeFromHTTPStatus(echoctx.New(c).GetContext(), herr.Code, logger),
 							"-",
 							fmt.Sprintf("%v", herr.Message),
 						)
