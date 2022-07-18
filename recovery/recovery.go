@@ -10,7 +10,7 @@ import (
 // Recovery converts a panic into an error.
 // See: example_test.go
 func Recovery(p interface{}) error {
-	e := fmt.Sprintf("panic recovered: %v", p)
+	e := fmt.Sprintf("panic recovered: %v ", p)
 	for depth := 0; ; depth++ {
 		pc, src, line, ok := runtime.Caller(depth)
 		if !ok {
