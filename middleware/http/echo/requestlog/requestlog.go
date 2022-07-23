@@ -52,6 +52,10 @@ func Middleware(logger applog.Logger, opt ...Option) echo.MiddlewareFunc {
 			if ip != "" {
 				label["ip_address"] = ip
 			}
+			origin := c.Request().Header.Get("Origin")
+			if origin != "" {
+				label["origin"] = origin
+			}
 			if ua := c.Request().UserAgent(); ua != "" {
 				label["user_agent"] = ua
 			}
