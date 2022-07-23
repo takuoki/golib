@@ -19,6 +19,7 @@ import (
 func TestMiddleware(t *testing.T) {
 
 	const requestIDKey = "Request-ID"
+	const originKey = "Origin"
 	const userAgentKey = "User-Agent"
 
 	testcases := map[string]struct {
@@ -26,6 +27,7 @@ func TestMiddleware(t *testing.T) {
 		method    string
 		uri       string
 		reqID     string
+		origin    string
 		userAgent string
 		wantLog   string
 		wantReqID string
@@ -37,19 +39,21 @@ func TestMiddleware(t *testing.T) {
 			method:    http.MethodGet,
 			uri:       "/test?a=1&b=2#xyz",
 			reqID:     "",
+			origin:    "",
 			userAgent: "",
 			wantLog:   `^request log \(host: .*, ip_address: [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+, method: GET, uri: /test\?a=1&b=2#xyz\)` + "\n$",
 			wantReqID: "req-id",
 		},
-		"exist reqID and userAgent": {
+		"exist reqID, origin and userAgent": {
 			opts: []echo_requestlog.Option{
 				echo_requestlog.RequestIDFunc(func() (string, error) { return "new-req-id", nil }),
 			},
 			method:    http.MethodPost,
 			uri:       "/test",
+			origin:    "http://localhost:8080",
 			reqID:     "req-id",
 			userAgent: "user-agent",
-			wantLog:   `^request log \(host: .*, ip_address: [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+, method: POST, uri: /test, user_agent: user-agent\)` + "\n$",
+			wantLog:   `^request log \(host: .*, ip_address: [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+, method: POST, origin: http://localhost:8080, uri: /test, user_agent: user-agent\)` + "\n$",
 			wantReqID: "req-id",
 		},
 		"create reqID error": {
@@ -86,6 +90,9 @@ func TestMiddleware(t *testing.T) {
 			req := httptest.NewRequest(tc.method, tc.uri, nil)
 			if tc.reqID != "" {
 				req.Header.Add(requestIDKey, tc.reqID)
+			}
+			if tc.origin != "" {
+				req.Header.Add(originKey, tc.origin)
 			}
 			if tc.userAgent != "" {
 				req.Header.Add(userAgentKey, tc.userAgent)
