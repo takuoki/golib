@@ -18,15 +18,13 @@ func Example_goroutine() {
 	for i := 0; i < 1; i++ {
 		i := i
 		eg.Go(func() (err error) {
-			panicked := true
 			defer func() {
-				if r := recover(); r != nil || panicked {
+				if r := recover(); r != nil {
 					err = recovery.Recovery(r)
 				}
 			}()
 
 			fmt.Printf("your code: %d\n", i)
-			panicked = false
 			return nil
 		})
 	}
