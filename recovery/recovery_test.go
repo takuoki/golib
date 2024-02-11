@@ -9,15 +9,13 @@ import (
 )
 
 func basicUsage(f func() error) (err error) {
-	panicked := true
 	defer func() {
-		if r := recover(); r != nil || panicked {
+		if r := recover(); r != nil {
 			err = recovery.Recovery(r)
 		}
 	}()
 
 	er := f()
-	panicked = false
 	return er
 }
 
@@ -29,7 +27,7 @@ func TestRecovery(t *testing.T) {
 		"no-error":  {f: func() error { return nil }},
 		"error":     {f: func() error { return errors.New("error message") }, wantErr: "error message"},
 		"panic":     {f: func() error { panic("panic message") }, wantErr: "panic recovered: panic message"},
-		"nil-panic": {f: func() error { panic(nil) }, wantErr: "panic recovered: <nil>"},
+		"nil-panic": {f: func() error { panic(nil) }, wantErr: "panic recovered: panic called with nil argument"},
 	}
 
 	for name, c := range testcase {
