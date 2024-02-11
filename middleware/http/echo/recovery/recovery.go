@@ -21,16 +21,13 @@ func Middleware(opt ...Option) echo.MiddlewareFunc {
 
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) (err error) {
-			panicked := true
 			defer func() {
-				if r := recover(); r != nil || panicked {
+				if r := recover(); r != nil {
 					err = recoverFrom(echoctx.New(c).GetContext(), r, opts.recoveryFunc)
 				}
 			}()
 
-			err = next(c)
-			panicked = false
-			return err
+			return next(c)
 		}
 	}
 }
