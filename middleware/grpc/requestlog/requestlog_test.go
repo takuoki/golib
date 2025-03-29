@@ -104,5 +104,5 @@ func (l *testLogger) Print(ctx context.Context, lv applog.Level, msg string, lab
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	fmt.Fprintln(l.out, string(jsonLog))
+	fmt.Fprintln(l.out, string(jsonLog)) //nolint:errcheck
 }

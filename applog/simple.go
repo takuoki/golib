@@ -119,5 +119,5 @@ func (l *simpleLogger) Print(ctx context.Context, lv Level, msg string, labels m
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	fmt.Fprintln(l.out, msg+labelMsg)
+	fmt.Fprintln(l.out, msg+labelMsg) //nolint:errcheck
 }

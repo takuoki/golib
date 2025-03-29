@@ -117,7 +117,7 @@ func (l *basicLogger) Print(ctx context.Context, lv Level, msg string, labels ma
 
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	fmt.Fprintln(l.out, string(jsonLog))
+	fmt.Fprintln(l.out, string(jsonLog)) //nolint:errcheck
 }
 
 type basicLog struct {
